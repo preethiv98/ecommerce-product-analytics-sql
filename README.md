@@ -1,41 +1,66 @@
-# E-Commerce Product Engagement & Conversion Analysis
+# 🛒 E-Commerce Product Engagement & Conversion Analysis
 
-## Overview
-Transformed [N] million clickstream events (Oct–Nov 2019, Kaggle
-"eCommerce behavior data from multi-category store") in PostgreSQL into a
-daily category-level summary table (7,625 rows) powering a Tableau Public dashboard.
+## 📊 Project Overview
+This project turns **[N] million raw clickstream events** (Oct–Nov 2019) into a compact, category-level reporting table in PostgreSQL, then visualizes it in Tableau. Moving the cleaning and aggregation upstream into SQL keeps the dashboard fast and the logic reproducible.
 
-## Tech Stack
-PostgreSQL 15 · DBeaver · Tableau Public
-SQL used: `SPLIT_PART`, `INITCAP`, `REPLACE`, `CASE WHEN` conditional aggregation,
-`GROUP BY`, [CTEs / window functions, only if used]
+| 📌 At a glance | |
+|---|---|
+| Source data | Kaggle eCommerce Behavior Data (multi-category store) |
+| Raw events | [N] million rows |
+| Summary table | 7,625 rows (day × product category) |
+| Row reduction | >99.9% |
+| Period | Oct 1 – Nov 30, 2019 |
 
-## Approach
-1. **Cleaned category paths in SQL.** Turned `furniture.universal.light` into
-   `Universal Light` so Tableau doesn't parse strings row by row.
-2. **Aggregated to sessions.** Counted sessions per day and category that reached
-   view, cart and purchase. [Describe your method.]
-3. **Pre-aggregated.** [N]M events → 7,625 rows (>99.9% fewer), so the
-   dashboard responds quickly.
+## 🛠️ Tech Stack & Architecture
+* **Database Engine:** PostgreSQL 15 (installed via Homebrew)
+* **Database IDE:** DBeaver Community Edition
+* **Data Visualization:** Tableau Public
+* **SQL Techniques:** `SPLIT_PART()`, `INITCAP()`, `REPLACE()`, `CASE WHEN` conditional aggregation, `GROUP BY`/`HAVING` [add CTEs / window functions only if used in your script]
 
-## Findings
-- **Smartphones drive revenue:** about [88]% of top-10 category revenue.
-  ![Revenue by category](images/revenue_by_category.png)
-- **Cart → purchase is the biggest drop:** [X]% of cart sessions end without a purchase
-  (excluding Nov 14–17). Highest in [category].
+```
+Kaggle CSVs  →  raw_events  →  product_performance_summary  →  Tableau
+ (Oct, Nov)     (PostgreSQL)     (day × category, cleaned)      (charts)
+```
 
-## Recommendation (hypothesis to test)
-Cart abandonment is the largest funnel loss, so a cart-reminder A/B test is a reasonable
-next step. Illustrative sizing: recovering 2% of abandoned carts at an average order value
-of $[X] ≈ $[Y]. This is a scenario, not a forecast.
+## 📐 Data Transformation & Optimization
+Raw category values are dot-separated paths (e.g. `furniture.universal.light`). Parsing millions of these inside Tableau caused rendering lag, so the work moved into SQL:
 
-## Assumptions & Limitations
-- Two months of data, so no seasonality or true lifetime value.
-- No order ID, so orders are approximated by purchase sessions.
-- Sessions that touch several categories are counted in each, so category totals overlap.
-- Sessions with no category were excluded.
+1. **🧹 Upstream string cleaning:** Used `SPLIT_PART()`, `INITCAP()` and `REPLACE()` to convert paths into readable labels (`Universal Light`) inside the database.
+2. **🔁 Session-level aggregation:** Counted sessions per day and category that reached `view`, `cart` and `purchase` [describe your exact method, e.g. conditional aggregation].
+3. **⚡ Pre-aggregation:** Collapsed [N] million events into a **7,625-row** summary table, so Tableau reads a small table instead of scanning raw logs.
 
-## Deliverables
-- [SQL transformation script](transform_and_aggregate.sql)
-- Dashboard screenshots are in the Findings section above.
-- Data: Kaggle (check the dataset's license before sharing anything beyond aggregates).
+## 📈 Key Findings
+
+### 💰 Smartphones dominate revenue
+Smartphones account for about **[88]%** of top-10 category revenue ($334.9M of $[381]M).
+
+![Revenue by product category](images/revenue_by_category.png)
+
+### 🔻 The biggest funnel loss is cart → purchase
+Excluding Nov 14–17, **[X]%** of sessions that added to cart did not purchase. The largest drop-off was in **[category]**.
+
+![Funnel by category](images/funnel_by_category.png)
+
+### ⚠️ Data quality issue found
+Purchase events are **missing from Nov 14 evening to Nov 16 morning**, then run **6–10× normal volume until Nov 17 evening**, while views and carts look normal. I treated these days as unreliable and excluded them from conversion rates.
+
+## 💡 Recommendation (a hypothesis to test)
+Cart abandonment is the largest loss in the funnel, so a **cart-reminder A/B test** is a sensible next step.
+*Illustrative sizing:* recovering 2% of abandoned carts at an average order value of $[X] is about $[Y]. This is a scenario, not a forecast.
+
+## 🚧 Assumptions & Limitations
+* Two months of data only: no seasonality and no true lifetime value.
+* No order ID, so orders are approximated by purchase sessions.
+* A session that touches several categories is counted in each, so category totals overlap.
+* Sessions with no category were excluded.
+
+## ▶️ How to Reproduce
+1. Download the two CSV files from Kaggle.
+2. Create the database and load them into `raw_events`.
+3. Run `transform_and_aggregate.sql` to build `product_performance_summary`.
+4. Connect Tableau to the summary table.
+
+## 🔗 Deliverables
+* [SQL Transformation Script](transform_and_aggregate.sql)
+* Dashboard screenshots in the `images/` folder
+* Data source: [Kaggle eCommerce Behavior Data](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store)
