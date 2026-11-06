@@ -1,27 +1,41 @@
-# E-Commerce Product Engagement & Conversion Pipeline
+# E-Commerce Product Engagement & Conversion Analysis
 
-## 📊 Project Overview
-This project builds an end-to-end data pipeline transforming over **10 million rows of raw clickstream event logs** (telemetry data) into an optimized, executive-level business intelligence asset. By moving heavy data engineering tasks upstream into a relational database, the resulting reporting dashboard loads instantly and delivers actionable revenue insights.
+## Overview
+Transformed [N] million clickstream events (Oct–Nov 2019, Kaggle
+"eCommerce behavior data from multi-category store") in PostgreSQL into a
+daily category-level summary table (7,625 rows) powering a Tableau Public dashboard.
 
-## 🛠️ Tech Stack & Architecture
-* **Database Engine:** PostgreSQL (v15 installed via Homebrew)
-* **Database IDE:** DBeaver Community Edition
-* **Data Visualization:** Tableau Public
-* **Core Concepts:** Common Table Expressions (CTEs), Conditional Aggregations, String Manipulation, Funnel Velocity Analysis
+## Tech Stack
+PostgreSQL 15 · DBeaver · Tableau Public
+SQL used: `SPLIT_PART`, `INITCAP`, `REPLACE`, `CASE WHEN` conditional aggregation,
+`GROUP BY`, [CTEs / window functions, only if used]
 
-## 📐 Data Transformation & Optimization Strategy
-Raw traffic data contains multi-part hierarchical strings (e.g., `furniture.universal.light`). Loading millions of raw event logs directly into visual software causes immediate processing lag. 
+## Approach
+1. **Cleaned category paths in SQL.** Turned `furniture.universal.light` into
+   `Universal Light` so Tableau doesn't parse strings row by row.
+2. **Aggregated to sessions.** Counted sessions per day and category that reached
+   view, cart and purchase. [Describe your method.]
+3. **Pre-aggregated.** [N]M events → 7,625 rows (>99.9% fewer), so the
+   dashboard responds quickly.
 
-To optimize performance, I executed the following data engineering tasks in **SQL**:
-1. **Upstream String Cleaning:** Developed automated pattern matching loops using `SPLIT_PART()` and `INITCAP()` to dynamically convert raw dot-notation strings into clean, user-friendly labels (`Universal Light`) directly within the database schema.
-2. **Session-Level Aggregation:** Compressed massive event-driven click streams into structured session markers (`view` ➔ `cart` ➔ `purchase`) using conditional logic (`MAX(CASE WHEN)`).
-3. **Flat-Table Consolidation:** Consolidated data points into a high-performance aggregated performance table, **reducing final dashboard file storage and dashboard load times by over 80%**.
+## Findings
+- **Smartphones drive revenue:** about [88]% of top-10 category revenue.
+  ![Revenue by category](images/revenue_by_category.png)
+- **Cart → purchase is the biggest drop:** [X]% of cart sessions end without a purchase
+  (excluding Nov 14–17). Highest in [category].
 
-## 📈 Strategic Business Insights
-* **The Funnel Bottleneck:** Analysis identified an 85% drop-off barrier between the `cart` stage and final `purchase` milestone inside high-margin electronics and home goods.
-* **Data Recommendation:** Recommended deploying automated marketing workflows to retarget customers within 3 hours of session drop-off, capturing a projected 2.5% recovery in leaked conversion funnels.
+## Recommendation (hypothesis to test)
+Cart abandonment is the largest funnel loss, so a cart-reminder A/B test is a reasonable
+next step. Illustrative sizing: recovering 2% of abandoned carts at an average order value
+of $[X] ≈ $[Y]. This is a scenario, not a forecast.
 
----
-### 🔗 Deliverables
-* [View the SQL Transformation Script](transform_and_aggregate.sql)
-* [Explore the Interactive Tableau Dashboard](PASTE_YOUR_TABLEAU_PUBLIC_URL_HERE)
+## Assumptions & Limitations
+- Two months of data, so no seasonality or true lifetime value.
+- No order ID, so orders are approximated by purchase sessions.
+- Sessions that touch several categories are counted in each, so category totals overlap.
+- Sessions with no category were excluded.
+
+## Deliverables
+- [SQL transformation script](transform_and_aggregate.sql)
+- Dashboard screenshots are in the Findings section above.
+- Data: Kaggle (check the dataset's license before sharing anything beyond aggregates).
