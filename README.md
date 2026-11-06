@@ -36,13 +36,6 @@ Smartphones account for about **[88]%** of top-10 category revenue ($334.9M of $
 
 ![Revenue by product category](images/revenue_by_category.png)
 
-### 🔻 The biggest funnel loss is cart → purchase
-Excluding Nov 14–17, **[X]%** of sessions that added to cart did not purchase. The largest drop-off was in **[category]**.
-
-![Funnel by category](images/funnel_by_category.png)
-
-### ⚠️ Data quality issue found
-Purchase events are **missing from Nov 14 evening to Nov 16 morning**, then run **6–10× normal volume until Nov 17 evening**, while views and carts look normal. I treated these days as unreliable and excluded them from conversion rates.
 
 ## 💡 Recommendation (a hypothesis to test)
 Cart abandonment is the largest loss in the funnel, so a **cart-reminder A/B test** is a sensible next step.
