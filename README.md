@@ -36,6 +36,8 @@ Smartphones account for about **[88]%** of top-10 category revenue ($334.9M of $
 
 **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis)**
 
+[![Revenue by product category](images/revenue_by_category.png)](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis)
+
 ## 💡 Recommendation (a hypothesis to test)
 Cart abandonment is the largest loss in the funnel, so a **cart-reminder A/B test** is a sensible next step.
 *Illustrative sizing:* recovering 2% of abandoned carts at an average order value of $[X] is about $[Y]. This is a scenario, not a forecast.
@@ -53,6 +55,7 @@ Cart abandonment is the largest loss in the funnel, so a **cart-reminder A/B tes
 4. Connect Tableau to the summary table.
 
 ## 🔗 Deliverables
+* [Interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis)
 * [SQL Transformation Script](transform_and_aggregate.sql)
 * Dashboard screenshots in the `images/` folder
 * Data source: [Kaggle eCommerce Behavior Data](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store)

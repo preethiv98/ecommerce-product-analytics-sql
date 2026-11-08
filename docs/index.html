@@ -3,21 +3,239 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>E-commerce Product Analytics</title>
+  <title>E-commerce Product Performance Dashboard</title>
+  <meta name="description" content="Clickstream analysis built with PostgreSQL and Tableau: revenue and conversion by product type and category, Oct–Nov 2019.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; color: #222; }
-    h1 { margin-bottom: 0.25rem; }
-    p { line-height: 1.5; }
+    :root {
+      color-scheme: light dark;
+      --page: #f6f7f9;
+      --card: #ffffff;
+      --ink: #14161a;
+      --ink-2: #4b5260;
+      --muted: #7b8494;
+      --line: #e4e7ec;
+      --accent: #2a78d6;
+      --accent-soft: #e8f1fc;
+      --radius: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #0e1013;
+        --card: #171a1f;
+        --ink: #f1f3f6;
+        --ink-2: #b9c0cc;
+        --muted: #8a93a3;
+        --line: #272c34;
+        --accent: #5598e7;
+        --accent-soft: #15233a;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: "Roboto", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+    /* hero */
+    header.hero {
+      background: linear-gradient(135deg, #0f2a4a 0%, #1c4f8f 55%, #2a78d6 100%);
+      color: #fff;
+      padding: 64px 0 88px;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+      padding: 5px 12px; border-radius: 999px; margin-bottom: 18px;
+    }
+    h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.1; margin: 0 0 14px; letter-spacing: -.02em; font-weight: 750; }
+    .lede { font-size: clamp(16px, 2vw, 19px); max-width: 720px; margin: 0 0 26px; color: rgba(255,255,255,.88); }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px;
+      padding: 11px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,.35);
+      color: #fff; background: rgba(255,255,255,.08); transition: background .15s, transform .15s;
+    }
+    .btn:hover { background: rgba(255,255,255,.18); text-decoration: none; transform: translateY(-1px); }
+    .btn.primary { background: #fff; color: #14407a; border-color: #fff; }
+    .btn.primary:hover { background: #eef4fc; }
+
+    /* stats */
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px;
+      margin-top: -48px; position: relative;
+    }
+    .stat {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 20px 22px; box-shadow: 0 6px 20px rgba(15, 30, 60, .08);
+    }
+    .stat .num { font-size: 30px; font-weight: 750; letter-spacing: -.02em; color: var(--ink); line-height: 1.1; }
+    .stat .lbl { margin-top: 6px; font-size: 14px; color: var(--ink-2); }
+
+    /* sections */
+    section { margin: 56px 0; }
+    h2 { font-size: 26px; letter-spacing: -.01em; margin: 0 0 6px; }
+    .sub { color: var(--ink-2); margin: 0 0 22px; max-width: 760px; }
+    #dashboard, .centered { text-align: center; }
+    #dashboard .sub, .centered .sub { margin-left: auto; margin-right: auto; }
+    .centered .step { text-align: left; }
+
+    .embed-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 12px; box-shadow: 0 6px 24px rgba(15, 30, 60, .06); overflow-x: auto;
+    }
+    .embed-card tableau-viz { display: block; margin: 0 auto; }
+    .hint { margin: 12px 4px 2px; font-size: 14px; color: var(--muted); text-align: center; }
+
+    /* how it was built */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; counter-reset: step; }
+    .step {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 22px; position: relative;
+    }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+      background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px; margin-bottom: 12px;
+    }
+    .step h3 { margin: 0 0 6px; font-size: 17px; }
+    .step p { margin: 0; color: var(--ink-2); font-size: 15px; }
+    code { background: var(--accent-soft); color: var(--accent); padding: 1px 6px; border-radius: 5px; font-size: .9em; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .tag { font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+
+    .note {
+      background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+      border-radius: 10px; padding: 16px 20px; color: var(--ink-2); font-size: 15px;
+    }
+
+    footer { border-top: 1px solid var(--line); padding: 28px 0 44px; color: var(--muted); font-size: 14px; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+    /* phone fallback: static image + button instead of the fixed-size embed */
+    .mobile-only { display: none; text-align: center; }
+    .mobile-only img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); display: block; margin-bottom: 14px; }
+    .btn.solid { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn.solid:hover { background: var(--accent); filter: brightness(1.08); }
+
+    @media (max-width: 760px) {
+      .desktop-only { display: none; }
+      .mobile-only { display: block; }
+    }
+    @media (max-width: 600px) {
+      header.hero { padding: 44px 0 72px; }
+      section { margin: 40px 0; }
+    }
   </style>
 </head>
 <body>
-  <h1>E-commerce Product Performance Dashboard</h1>
-  <p>Built from millions of clickstream events (Oct–Nov). Data cleaned and aggregated upstream in PostgreSQL, visualized in Tableau.
-     SQL and methodology on
-     <a href="https://github.com/preethiv98/ecommerce-product-analytics-sql">GitHub</a>.</p>
 
-  <!-- PASTE TABLEAU PUBLIC EMBED CODE BELOW THIS LINE
-       (Tableau Public dashboard -> Share -> Embed Code) -->
+  <header class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Data Portfolio · SQL + Tableau</span>
+      <h1>E-commerce Product Performance Dashboard</h1>
+      <p class="lede">
+        Millions of raw clickstream events (Oct–Nov 2019), cleaned and aggregated in PostgreSQL,
+        then explored in an interactive Tableau dashboard: revenue and conversion by product type and category.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="#dashboard">View the dashboard ↓</a>
+        <a class="btn" href="https://github.com/preethiv98/ecommerce-product-analytics-sql">SQL &amp; method on GitHub</a>
+        <a class="btn" href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">Open on Tableau Public</a>
+        <a class="btn" href="https://www.linkedin.com/in/preethivenkat/">Connect on LinkedIn</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <div class="stats" aria-label="Project at a glance">
+      <div class="stat"><div class="num">7,625</div><div class="lbl">rows in the summary table (day × category)</div></div>
+      <div class="stat"><div class="num">2 months</div><div class="lbl">Oct 1 – Nov 30, 2019</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">product types grouping the categories</div></div>
+      <div class="stat"><div class="num">&gt;99.9%</div><div class="lbl">row reduction from raw events</div></div>
+    </div>
+
+    <section id="dashboard">
+      <h2>Interactive dashboard</h2>
+      <p class="sub">Click a product type to see its categories, revenue, conversion and top and lowest category.<br>Click again to reset.</p>
+      <div class="embed-card">
+        <div class="desktop-only">
+          <script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+          <tableau-viz id="tableau-viz"
+            src="https://public.tableau.com/views/Revenue_By_Products/Analysis"
+            width="1000" height="800"
+            hide-tabs toolbar="bottom"></tableau-viz>
+          <p class="hint">Best viewed on a desktop screen.</p>
+        </div>
+        <div class="mobile-only">
+          <a href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">
+            <img src="images/revenue_by_category.png" alt="Bar chart of revenue by product category, Oct–Nov 2019" loading="lazy">
+          </a>
+          <a class="btn solid" href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">Open the interactive dashboard ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="centered">
+      <h2>How it was built</h2>
+      <p class="sub">Moving the heavy lifting into SQL keeps the dashboard fast and the logic reproducible.</p>
+      <div class="steps">
+        <div class="step">
+          <h3>Clean in SQL</h3>
+          <p>Dot-separated category paths such as <code>furniture.universal.light</code> were converted into readable labels with <code>SPLIT_PART()</code>, <code>INITCAP()</code> and <code>REPLACE()</code>.</p>
+        </div>
+        <div class="step">
+          <h3>Aggregate upstream</h3>
+          <p>Events were collapsed into a 7,625-row table of views, carts and purchases per day and category, so Tableau never scans raw logs.</p>
+        </div>
+        <div class="step">
+          <h3>Group and visualize</h3>
+          <p>A <code>category_map</code> table groups about 130 categories into 8 product types, powering the click-to-drill dashboard.</p>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">PostgreSQL</span><span class="tag">DBeaver</span>
+        <span class="tag">Tableau Public</span><span class="tag">SQL</span><span class="tag">Data modeling</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Limitations</h2>
+      <div class="note">
+        Two months of data only, so no seasonality or lifetime value. Orders are approximated by purchase sessions
+        (no order ID), and a session touching several categories is counted in each. Product types are my own grouping,
+        not part of the source data. Data source:
+        <a href="https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store">Kaggle eCommerce Behavior Data</a>.
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Built by Preethi Venkataraman</span>
+      <span>
+        <a href="https://www.linkedin.com/in/preethivenkat/">LinkedIn</a> ·
+        <a href="https://github.com/preethiv98/ecommerce-product-analytics-sql">GitHub</a> ·
+        <a href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">Tableau Public</a>
+      </span>
+    </div>
+  </footer>
 
 </body>
 </html>
