@@ -34,8 +34,7 @@ Raw category values are dot-separated paths (e.g. `furniture.universal.light`). 
 ### 💰 Smartphones dominate revenue
 Smartphones account for about **[88]%** of top-10 category revenue ($334.9M of $[381]M).
 
-![Revenue by product category](images/revenue_by_category.png)
-
+**[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis)**
 
 ## 💡 Recommendation (a hypothesis to test)
 Cart abandonment is the largest loss in the funnel, so a **cart-reminder A/B test** is a sensible next step.
