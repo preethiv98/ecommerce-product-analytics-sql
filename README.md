@@ -1,5 +1,8 @@
 # 🛒 E-Commerce Product Engagement & Conversion Analysis
 
+### 🌐 [View the live project page](https://preethiv98.github.io/ecommerce-product-analytics-sql/)
+Interactive dashboard, method and findings in one page. Also on [Tableau Public](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis).
+
 ## 📊 Project Overview
 This project turns **[N] million raw clickstream events** (Oct–Nov 2019) into a compact, category-level reporting table in PostgreSQL, then visualizes it in Tableau. Moving the cleaning and aggregation upstream into SQL keeps the dashboard fast and the logic reproducible.
 
@@ -55,6 +58,7 @@ Cart abandonment is the largest loss in the funnel, so a **cart-reminder A/B tes
 4. Connect Tableau to the summary table.
 
 ## 🔗 Deliverables
+* [Live project page (GitHub Pages)](https://preethiv98.github.io/ecommerce-product-analytics-sql/)
 * [Interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis)
 * [SQL Transformation Script](transform_and_aggregate.sql)
 * Dashboard screenshots in the `images/` folder
