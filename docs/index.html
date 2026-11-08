@@ -146,6 +146,8 @@
 
     /* phone fallback: static image + button instead of the fixed-size embed */
     .mobile-only { display: none; text-align: center; }
+    .open-full { margin: 12px 0 4px; }
+    .embed-card tableau-viz { width: 100%; }
     .mobile-only img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); display: block; margin-bottom: 14px; }
     .btn.solid { background: var(--accent); color: #fff; border-color: var(--accent); }
     .btn.solid:hover { background: var(--accent); filter: brightness(1.08); }
@@ -153,6 +155,7 @@
     @media (max-width: 760px) {
       .desktop-only { display: none; }
       .mobile-only { display: block; }
+      .embed-card { padding: 4px; }
     }
     @media (max-width: 600px) {
       header.hero { padding: 44px 0 72px; }
@@ -233,21 +236,34 @@
       <h2>Interactive dashboard</h2>
       <p class="sub">Click a product type to see its categories, revenue, conversion and top and lowest category.<br>Click again to reset.</p>
       <div class="embed-card">
-        <div class="desktop-only">
-          <script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
-          <tableau-viz id="tableau-viz"
-            src="https://public.tableau.com/views/Revenue_By_Products/Analysis"
-            width="1000" height="800"
-            hide-tabs toolbar="bottom"></tableau-viz>
-          <p class="hint">Best viewed on a desktop screen.</p>
-        </div>
-        <div class="mobile-only">
-          <a href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">
-            <img src="images/revenue_by_category.png" alt="Bar chart of revenue by product category, Oct–Nov 2019" loading="lazy">
-          </a>
-          <a class="btn solid" href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">Open the interactive dashboard ↗</a>
-        </div>
+        <script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+        <tableau-viz id="tableau-viz"
+          src="https://public.tableau.com/views/Revenue_By_Products/Analysis"
+          width="100%" height="800"
+          hide-tabs toolbar="bottom"></tableau-viz>
+        <p class="hint desktop-only">Best viewed on a larger screen.</p>
+        <p class="mobile-only open-full">
+          <a class="btn solid" href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis">Open full screen on Tableau Public ↗</a>
+        </p>
       </div>
+      <script>
+        // Size the dashboard to the screen: phones get Tableau's phone layout and a height that fits the width.
+        (function () {
+          var viz = document.getElementById('tableau-viz');
+          function fit() {
+            var w = viz.parentElement.clientWidth;
+            if (w < 760) {
+              viz.setAttribute('device', 'phone');
+              viz.setAttribute('height', Math.round(w * 1.9));
+            } else {
+              viz.setAttribute('device', 'desktop');
+              viz.setAttribute('height', Math.min(800, Math.round(w * 0.8)));
+            }
+          }
+          fit();
+          var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(fit, 200); });
+        })();
+      </script>
     </section>
 
     <section id="how" class="centered">
