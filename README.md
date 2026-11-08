@@ -1,7 +1,12 @@
 # 🛒 E-Commerce Product Engagement & Conversion Analysis
 
-### 🌐 [View the live project page](https://preethiv98.github.io/ecommerce-product-analytics-sql/)
-Interactive dashboard, method and findings in one page. Also on [Tableau Public](https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis).
+<p align="center">
+  <a href="https://preethiv98.github.io/ecommerce-product-analytics-sql/"><img alt="View the live project page" src="https://img.shields.io/badge/%F0%9F%8C%90%20View%20the%20live%20project%20page-2a78d6?style=for-the-badge"></a>
+  <a href="https://public.tableau.com/app/profile/preethi.venkataraman/viz/Revenue_By_Products/Analysis"><img alt="Open on Tableau Public" src="https://img.shields.io/badge/Tableau%20Public-Interactive%20dashboard-1f3a5f?style=for-the-badge&logo=tableau&logoColor=white"></a>
+  <a href="https://www.linkedin.com/in/preethivenkat/"><img alt="LinkedIn" src="https://img.shields.io/badge/LinkedIn-Preethi%20Venkataraman-0a66c2?style=for-the-badge&logo=linkedin&logoColor=white"></a>
+</p>
+
+<p align="center">Interactive dashboard, method and findings in one page.</p>
 
 ## 📊 Project Overview
 This project turns **[N] million raw clickstream events** (Oct–Nov 2019) into a compact, category-level reporting table in PostgreSQL, then visualizes it in Tableau. Moving the cleaning and aggregation upstream into SQL keeps the dashboard fast and the logic reproducible.
