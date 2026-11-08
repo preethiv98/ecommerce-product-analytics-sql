@@ -92,6 +92,24 @@
     #dashboard, .centered { text-align: center; }
     #dashboard .sub, .centered .sub { margin-left: auto; margin-right: auto; }
     .centered .step { text-align: left; }
+    .section-head { text-align: center; margin-bottom: 26px; }
+    .section-head .sub { margin-left: auto; margin-right: auto; }
+    .kicker { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .fact { background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; text-align: center; }
+    .fact b { display: block; font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -.01em; }
+    .fact span { font-size: 13px; color: var(--ink-2); }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+    .info { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: 0 6px 20px rgba(15,30,60,.05); }
+    .info .icon { width: 44px; height: 44px; display: grid; place-items: center; font-size: 22px; background: var(--accent-soft); border-radius: 12px; margin-bottom: 14px; }
+    .info h3 { margin: 0 0 10px; font-size: 20px; font-weight: 700; }
+    .info p { margin: 0 0 12px; font-size: 16px; line-height: 1.7; color: var(--ink-2); }
+    .info .aside { margin: 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+    .checks { list-style: none; margin: 0; padding: 0; }
+    .checks li { position: relative; padding: 0 0 12px 30px; font-size: 16px; line-height: 1.6; color: var(--ink-2); }
+    .checks li:last-child { padding-bottom: 0; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; top: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+    .checks strong { color: var(--ink); font-weight: 700; }
 
     .embed-card {
       background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
@@ -169,6 +187,47 @@
       <div class="stat"><div class="num">8</div><div class="lbl">product types grouping the categories</div></div>
       <div class="stat"><div class="num">&gt;99.9%</div><div class="lbl">row reduction from raw events</div></div>
     </div>
+
+    <section id="about">
+      <div class="section-head">
+        <span class="kicker">The project</span>
+        <h2>About the data and the analysis</h2>
+        <p class="sub">What the raw data contains, and the questions I set out to answer with it.</p>
+      </div>
+
+      <div class="facts" aria-label="Dataset facts">
+        <div class="fact"><b>110M</b><span>clickstream events</span></div>
+        <div class="fact"><b>Oct–Nov 2019</b><span>two months of activity</span></div>
+        <div class="fact"><b>~130</b><span>product categories</span></div>
+        <div class="fact"><b>3</b><span>event types: view, cart, purchase</span></div>
+      </div>
+
+      <div class="two-col">
+        <article class="info">
+          <div class="icon" aria-hidden="true">🗂️</div>
+          <h3>What the data is</h3>
+          <p>
+            Every row is one shopper action in a multi-category online store: a
+            <code>view</code>, a <code>cart</code> add or a <code>purchase</code>.
+            Each carries a timestamp, product, brand, price, user and session, plus a category path like
+            <code>electronics.video.tv</code>.
+          </p>
+          <p class="aside">There is no order ID or customer profile, so I analyzed at the session and category level.</p>
+        </article>
+
+        <article class="info">
+          <div class="icon" aria-hidden="true">🔎</div>
+          <h3>What I analyzed</h3>
+          <ul class="checks">
+            <li><strong>Revenue</strong> by product type and category. Phones &amp; Computing is about 80% of categorized revenue.</li>
+            <li><strong>The funnel</strong> from views to carts to purchases, to see where shoppers drop off.</li>
+            <li><strong>Conversion</strong> by category: what turns browsing into buying.</li>
+            <li><strong>Top and lowest</strong> category within each product type.</li>
+            <li><strong>Average order value</strong> in each category.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
 
     <section id="dashboard">
       <h2>Interactive dashboard</h2>
